@@ -77,7 +77,7 @@ async function showtop10(serverid) {
 
 async function showglobal() {
 	outstr = "\n```python\n";
-	outstr += "#     FruitMachine Global Leaderboard";
+	outstr += "#     FruitMachine Global Leaderboard"; // 37 chars
 	var results = player.global();
 	for (var i = 0; i < results.length; i++) {
 		outstr += '\n' + (i + 1).toString().padStart(3) + ' ';
@@ -86,7 +86,7 @@ async function showglobal() {
 		outstr += results[i].server;
 	}
 	outstr += "\n```";
-	return outstr;
+	return outstr.substr(0,1995);
 }
 
 async function stats(pid, serverid) {

@@ -58,7 +58,7 @@ const update_player = function (score,name,id,server) {
 }
 module.exports.update_player = update_player;
 
-const global_str = 'SELECT name,score,server FROM players ORDER BY score DESC';
+const global_str = 'SELECT name,score,server FROM players ORDER BY score DESC LIMIT 30';
 const global_stmt = db.prepare(global_str);
 
 const global = function () {
