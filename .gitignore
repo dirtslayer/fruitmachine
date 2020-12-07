@@ -1,0 +1,3 @@
+node_modules/*
+src/fm4.db
+src/discord-key.js
