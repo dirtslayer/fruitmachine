@@ -1,6 +1,6 @@
 'use strict';
 const { re } = require('./emoji');
-const db = require('better-sqlite3')('fm4.db');
+const db = require('better-sqlite3')('fruitmachine.db');
 
 const server_settings_str = 'SELECT * FROM settings WHERE server = ?';
 var server_settings_stmt;

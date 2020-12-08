@@ -1,4 +1,4 @@
 node_modules/*
 
-fm4.db
+fruitmachine.db
 src/discord-key.js

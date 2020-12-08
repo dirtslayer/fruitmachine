@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "players" (
-    "server" TEXT, "score" INTEGER, "name" TEXT, "id" TEXT, 
+    "server" TEXT, "highss" INTEGER, "score" INTEGER, "name" TEXT, "id" TEXT, 
     PRIMARY KEY("id","server"));
 CREATE TABLE IF NOT EXISTS "settings" ( 
     "server" TEXT, 

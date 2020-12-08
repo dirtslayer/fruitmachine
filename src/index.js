@@ -13,39 +13,77 @@ client.once('ready', (msg) => {
 });
 
 const NFRUITS = 5;
-const PRIZE_AMOUNTS = [5, 10, 25, 50, 100];
+const PRIZE_AMOUNTS = [1, 5, 10, 50, 100];
 
 async function spin(serverid, pid, pun) {
 
 	const prizes = settings.get_server_prizes(serverid);
 
 	if (!player.has_player(pid, serverid)) {
-		player.add_player(serverid, 1000, pun, pid);
+		player.add_player(serverid, 1000, 0, pun, pid);
 	}
-
 	const p = player.get_player(pid, serverid);
-	const curscore = p.score;
-
 	outstr = "abc";
-
 	var numbers = new Array(3)
 	for (var i = 0; i < numbers.length; i++) {
 		numbers[i] = Math.floor(Math.random() * NFRUITS);
 	}
-
 	outstr = prizes[numbers[0]] + ' ' + prizes[numbers[1]] + ' ' + prizes[numbers[2]];
 	// win    
 	if ((numbers[0] == numbers[1]) && (numbers[0] == numbers[2])) {
 		//win
-		client.user.setActivity(outstr + ' ' + pun, { type: 3 });
-		player.update_player(curscore + PRIZE_AMOUNTS[numbers[0]], pun, pid, serverid);
+		//client.user.setActivity(outstr + ' ' + pun, { type: 3 });
+		p.score += PRIZE_AMOUNTS[numbers[0]] - 1;
+		player.update_player(p.score, p.highss, pun, pid, serverid);
 		winnings.add_winnings(serverid, pid, prizes[numbers[0]]);
 		outstr += '  +' + PRIZE_AMOUNTS[numbers[0]];
 	} else {
-		// loose
-		player.update_player(curscore - 1, pun, pid, serverid);
-		outstr += ' ' + (curscore - 1).toString();
+		p.score = p.score - 1;
+		player.update_player(p.score ,p.highss, pun, pid, serverid);
+		outstr += ' ' + p.score;
 	}
+	console.log(pun + " " + outstr);
+	return outstr;
+}
+
+function superspin(serverid, pid, pun) {
+
+	const winning_indexs = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+	const prizes = settings.get_server_prizes(serverid);
+
+	if (!player.has_player(pid, serverid)) {
+		player.add_player(serverid, 1000, 0, pun, pid);
+	}
+
+	const p = player.get_player(pid, serverid);
+	
+	outstr = "abc";
+
+	var numbers = new Array(9)
+	for (var i = 0; i < numbers.length; i++) {
+		numbers[i] = Math.floor(Math.random() * NFRUITS);
+	}
+
+	outstr = '\n' + prizes[numbers[0]] + ' ' + prizes[numbers[1]] + ' ' + prizes[numbers[2]] + '\n' +
+	prizes[numbers[3]] + ' ' + prizes[numbers[4]] + ' ' + prizes[numbers[5]] + '\n' +
+	prizes[numbers[6]] + ' ' + prizes[numbers[7]] + ' ' + prizes[numbers[8]] ;
+	// win    
+	p.score = p.score - 10; // super spin cost
+	var spin_outcome = 0;
+
+	winning_indexs.forEach(element => {
+	if ((numbers[element[0]] == numbers[element[1]]) && (numbers[element[0]] == numbers[element[2]])) {
+		spin_outcome += PRIZE_AMOUNTS[numbers[element[0]]];
+		winnings.add_winnings(serverid, pid, prizes[numbers[element[0]]]);
+		outstr += '  +' + PRIZE_AMOUNTS[numbers[element[0]]];
+	} 
+});
+	if (spin_outcome > p.highss) {
+		p.highss = spin_outcome;
+	}
+	p.score += spin_outcome;
+	player.update_player(p.score, p.highss , pun, pid, serverid);
+	outstr += ' ' + p.score;
 	console.log(pun + " " + outstr);
 	return outstr;
 }
@@ -90,8 +128,8 @@ async function showglobal() {
 }
 
 async function stats(pid, serverid) {
-	var curscore = player.get_player(pid, serverid).score;
-	var outstr = "score: " + curscore + ' prizes: ';
+	var p = player.get_player(pid, serverid);
+	var outstr = "score: " + p.score + ' high super spin: ' + p.highss + ' prizes: ';
 	var curprizes = winnings.get_player_winnings(serverid, pid);
 	for (const [key, value] of Object.entries(curprizes)) {
 		outstr += `${value.prize}`;
@@ -131,12 +169,21 @@ client.on('message', async message => {
 			var spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
 			return message.reply(spinres);
 		}
+		if ((message.content === 'sss') || (message.content === 'ss') || (message.content === 'SS')|| (message.content === 'SSS')) {
+			var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
+			return message.reply(spinres);
+		}
+
 	} 
 	const parsed = parse.parse(message, prefix, { allowSpaceBeforeCommand: true });
 	if (!parsed.success) return;
 	if (parsed.command === "invite") return message.reply('\n<https://discord.com/api/oauth2/authorize?client_id=780118548760625163&permissions=2048&scope=bot>');
 	if (parsed.command === "spin") {
 		var spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
+		return message.reply(spinres);
+	}
+	if (parsed.command === "ss") {
+		var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
 		return message.reply(spinres);
 	}
 	if (parsed.command === "prizes") return message.reply(await showprizes(message_guild_name));
@@ -241,7 +288,8 @@ client.on('message', async message => {
 
 	if (parsed.command === "help") {
 		var helpson = {
-			'spin': 'Chance to win a prize',
+			'spin': 'Chance to win a prize (cost 1)',
+			'ss' : '8 chances to win (cost 10)',
 			'prizes': 'Displays prizes',
 			'stats': 'Shows your score and more',   // inventory w/l
 			'top10': `${message_guild_name} leaders`,
