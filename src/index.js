@@ -191,6 +191,19 @@ client.on('message', async message => {
 	if (parsed.command === "top10") return message.reply(await showtop10(message_guild_name));
 	if (parsed.command === "global") return message.reply(await showglobal());
 	if (parsed.command === "stats") return message.reply(await stats(message.author.id, message_guild_name));
+
+	if (parsed.command === "ri") {
+		
+		const instr = parsed.reader.getRemaining();
+		if ( (instr==null) || (instr.length==0) ) {
+			return message.reply('😜');
+		}
+		const toret = emoji.ri(instr);
+		return message.reply(toret);
+	}
+
+
+
 	if (parsed.command === "set") {
 		
 		if (!allowed_admin(message)) {

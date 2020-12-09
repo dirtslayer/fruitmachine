@@ -47,7 +47,19 @@ const all = function() {
     return outstr;
     
 }
-
-//console.log(re()+re()+re()+re()+re()+re()+re()+re()+re()+re()+re()+re()+re());
-
-//console.log(all());
+const abc = ["🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮", "🇯", "🇰", "🇱", "🇲", "🇳", "🇴", "🇵", "🇶", "🇷", "🇸", "🇹", "🇺", "🇻", "🇼", "🇽", "🇾", "🇿"];
+const ri = function(sentance = 'puppy') {
+    //abc['c'.charCodeAt()-'a'.charCodeAt()]
+    var toret = '';
+    const lowerstr = sentance.toLowerCase();
+    [...lowerstr].forEach(character => {
+        const i = character.charCodeAt() - 'a'.charCodeAt();
+        if (i>=0 && i<26) {
+            toret += abc[i] + ' ';
+        } else {
+            toret += character;
+        }       
+    });
+    return toret;
+}
+module.exports.ri = ri;
