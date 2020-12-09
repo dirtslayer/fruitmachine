@@ -165,11 +165,12 @@ client.on('message', async message => {
 	}
 	const alias_setting  = settings.get_server_alias(message_guild_name);
 	if (alias_setting != 'false') {
-		if ((message.content === 'spin') || (message.content === 's') || (message.content === 'S')) {
+		const mcl = message.content.toLowerCase();
+		if ((mcl === 'spin') || (mcl === 's')) {
 			var spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
 			return message.reply(spinres);
 		}
-		if ((message.content === 'sss') || (message.content === 'ss') || (message.content === 'SS')|| (message.content === 'SSS')) {
+		if ((mcl === 'sss') || (mcl === 'ss') ) {
 			var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
 			return message.reply(spinres);
 		}
