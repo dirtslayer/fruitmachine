@@ -144,10 +144,21 @@ const allowed_admin = function(message) {
 }
 
 client.on('message', async message => {
-	const message_guild_name = message.guild.name;
-	
-	var server_settings;
 	var prefix;
+	const message_guild_name = message.guild.name;
+	try {
+		const first_mention_tag = message.mentions.members.first(1)[0].user.tag;
+	
+		if ( first_mention_tag === 'fruitmachine#9521' ) {
+			prefix = settings.get_server_prefix(message_guild_name);
+			return message.reply(`fruitmachine prefix is ${prefix}`);
+		}
+	} catch (err) {
+		// do nothing
+	}
+
+	var server_settings;
+	
 	try {
 		server_settings = settings.get_server_settings(message_guild_name);
 		prefix = settings.get_server_prefix(message_guild_name);
@@ -327,6 +338,7 @@ client.on('message', async message => {
 			'channel [channel|false]': 'restrict to channel',
 			'prefix *': 'change prefix to *',
 			'prefix fm-': 'reset prefix to fm-',
+			'@fruitmachine' : 'display current prefix',
 			'admin-user-add': 'add admin',
 			'admin-user-del' : 'del admin',
 			'admin-user-list' : 'list admins'
