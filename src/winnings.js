@@ -4,7 +4,7 @@ const add_winnings_str = 'INSERT INTO winnings (sid,pid,prize) VALUES (?, ?, ?)'
 const add_winnings_stmt = db.prepare(add_winnings_str);
 
 const add_winnings = function (sid,pid,prize) {
-    console.log('add winnings: '+ sid + ' ' + pid + ' ' + prize);
+    // console.log('add winnings: '+ sid + ' ' + pid + ' ' + prize);
     try {
     var e = add_winnings_stmt.run(sid,pid,prize);
     } catch ( error ) {

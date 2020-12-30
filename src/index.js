@@ -42,7 +42,7 @@ async function spin(serverid, pid, pun) {
 		player.update_player(p.score ,p.highss, pun, pid, serverid);
 		outstr += ' ' + p.score;
 	}
-	console.log(pun + " " + outstr);
+	// console.log(pun + " " + outstr);
 	return outstr;
 }
 
@@ -84,7 +84,7 @@ function superspin(serverid, pid, pun) {
 	p.score += spin_outcome;
 	player.update_player(p.score, p.highss , pun, pid, serverid);
 	outstr += ' ' + p.score;
-	console.log(pun + " " + outstr);
+	// console.log(pun + " " + outstr);
 	return outstr;
 }
 
@@ -108,7 +108,7 @@ async function showtop10(serverid) {
 		outstr += results[i].name.padStart(33, '.') + ' ';
 		outstr += results[i].score;
 	}
-	//console.log('t10: ' + outstr);
+	//.log('t10: ' + outstr);
 	outstr += "\n```";
 	return outstr;
 }
