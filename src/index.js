@@ -42,7 +42,11 @@ async function spin(serverid, pid, pun) {
 		player.update_player(p.score ,p.highss, pun, pid, serverid);
 		outstr += ' ' + p.score;
 	}
+<<<<<<< HEAD
+	//console.log(pun + " " + outstr);
+=======
 	// console.log(pun + " " + outstr);
+>>>>>>> 437addca2b1bda69dd8b4692998e0feaf2791aac
 	return outstr;
 }
 
@@ -88,6 +92,116 @@ function superspin(serverid, pid, pun) {
 	return outstr;
 }
 
+//
+// returns the spin emojis separate from the net score so that can compare outcomes
+/* { spinstr : "aaa\nbbb\nccc",
+	 outcome: "-10"}
+*/	 
+function fightss(serverid) {
+	var outstr = "";
+	var spin_outcome = -10;
+	const winning_indexs = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+	const prizes = settings.get_server_prizes(serverid);
+
+	var numbers = new Array(9)
+	for (var i = 0; i < numbers.length; i++) {
+		numbers[i] = Math.floor(Math.random() * NFRUITS);
+	}
+
+	outstr = '\n' + prizes[numbers[0]] + ' ' + prizes[numbers[1]] + ' ' + prizes[numbers[2]] + '\n' +
+	prizes[numbers[3]] + ' ' + prizes[numbers[4]] + ' ' + prizes[numbers[5]] + '\n' +
+	prizes[numbers[6]] + ' ' + prizes[numbers[7]] + ' ' + prizes[numbers[8]] ;
+	// win    
+	winning_indexs.forEach(element => {
+	if ((numbers[element[0]] == numbers[element[1]]) && (numbers[element[0]] == numbers[element[2]])) {
+		spin_outcome += PRIZE_AMOUNTS[numbers[element[0]]];
+	} 
+});
+	const objtoret = { spinstring : outstr, spinoutcome: spin_outcome}; 
+	return objtoret;
+}
+
+
+// dont forget to manage the outcome high score history for the players ....
+
+function fight(serverid, pid, pun, orank = 1) {
+	var toret = "";
+	var o = player.server_rank(serverid,orank-1); 
+	if (typeof o == 'undefined') {
+		o = player.server_rank(serverid,0); 
+	}
+	//player.server_first(serverid);
+	// fight first place person for now, will add parameter later
+
+	if (!player.has_player(pid, serverid)) {
+		player.add_player(serverid, 1000, 0, pun, pid);
+	}
+
+	const p = player.get_player(pid, serverid);
+
+	
+	p.spins = [];
+	o.spins = [];
+
+	var winner = null;
+	var looser = null;
+
+	while (winner == null) {
+		const ps = fightss(serverid);
+		const os = fightss(serverid);
+		p.spins.push(ps);
+		o.spins.push(os);
+
+		if (os.spinoutcome > ps.spinoutcome) {
+			winner = o;
+			looser = p;
+		} else if (ps.spinoutcome > os.spinoutcome) {
+			winner = p;
+			looser = o;
+		}
+		
+	}
+	
+	var ostring = "```python\n";
+	//ostring += `\n`+ mypadstart( o.name ,8) + '   ' + mypadstart(p.name,8);
+	//ostring += JSON.stringify(o);
+	ostring += `You        ${o.name}`;
+	ostring += "\n```";
+	var otally = 0;
+	var ptally = 0;
+
+	for (var i = 0; i < o.spins.length; i++) {
+		otally += o.spins[i].spinoutcome;
+		ptally += p.spins[i].spinoutcome;
+		olines = o.spins[i].spinstring.split('\n');
+		plines = p.spins[i].spinstring.split('\n');
+		ostring += '\n';
+		ostring += plines[1] +  '       ' + olines[1] + '\n';
+		ostring += plines[2] +  '       ' + olines[2] + '\n';
+		ostring += plines[3] +  '       ' + olines[3] + '\n';
+	}
+	ostring += "\n```python\n";
+	ostring += `\n`+ mypadstart(ptally.toString(),8) + '   ' + mypadstart(otally.toString(),8);
+
+	p.score += ptally;
+	o.score += otally;
+	ostring += `\n`+ mypadstart(p.score.toString(),8) + '   ' + mypadstart(o.score.toString(),8);
+
+	ostring += '\n```'
+	if (winner == p) {
+		ostring += '🙂';
+	} else {
+		ostring += '🤷';
+	}
+
+	player.update_player(p.score, p.highss , pun, pid, serverid);
+	player.update_player(o.score, o.highss , o.name, o.id, serverid);
+	
+	return ostring;
+
+}
+
+
 async function showprizes(serverid) {
 	//const serv = settings.get_server(serverid);
 	const prizes = settings.get_server_prizes(serverid);
@@ -113,13 +227,22 @@ async function showtop10(serverid) {
 	return outstr;
 }
 
+function unicodeLength(str) {
+	return [...str].length
+  }
+function mypadstart(str,width) {
+	const l = unicodeLength(str);
+	return '.'.repeat(width-l) + str;
+}  
+
 async function showglobal() {
 	outstr = "\n```python\n";
 	outstr += "#     FruitMachine Global Leaderboard"; // 37 chars
 	var results = player.global();
 	for (var i = 0; i < results.length; i++) {
 		outstr += '\n' + (i + 1).toString().padStart(3) + ' ';
-		outstr += results[i].name.padStart(33, '.') + ' ';
+		//outstr += results[i].name.padStart(33, '.') + ' ';
+		outstr += mypadstart(results[i].name,33) + ' ';
 		outstr += results[i].score.toString().padStart(8, '.') + ' ';;
 		outstr += results[i].server;
 	}
@@ -185,7 +308,12 @@ client.on('message', async message => {
 			var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
 			return message.reply(spinres);
 		}
-
+		if (mcl.substr(0,2) === 'ff')  {
+			const r = parseInt(mcl.substr(2),10);
+		 var ffress = await fight(message_guild_name, message.author.id, message.member.displayName,r);
+		return message.reply(ffress);
+		}
+		
 	} 
 	const parsed = parse.parse(message, prefix, { allowSpaceBeforeCommand: true });
 	if (!parsed.success) return;
@@ -198,10 +326,23 @@ client.on('message', async message => {
 		var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
 		return message.reply(spinres);
 	}
+	if ((parsed.command === "ff") || (parsed.command === "fight")){
+		const r = parsed.reader.getInt();
+
+		 var ffress = await fight(message_guild_name, message.author.id, message.member.displayName,r);
+		return message.reply(ffress);
+	}
+	
 	if (parsed.command === "prizes") return message.reply(await showprizes(message_guild_name));
 	if (parsed.command === "top10") return message.reply(await showtop10(message_guild_name));
 	if (parsed.command === "global") return message.reply(await showglobal());
-	if (parsed.command === "stats") return message.reply(await stats(message.author.id, message_guild_name));
+
+
+	if (parsed.command === "stats") {
+		const instr = parsed.reader.getRemaining();
+
+		//return message.reply(await stats(message.author.id, message_guild_name));
+	}
 
 	if (parsed.command === "ri") {
 		
@@ -259,7 +400,7 @@ client.on('message', async message => {
 		var channelstr = parsed.reader.getString();
 		//channelstr = channelstr.trimLeft('<#');
 		//channelstr = channelstr.trimRight('>');
-		console.log('channelstr : ' + channelstr);
+		//console.log('channelstr : ' + channelstr);
 		if ( (channelstr==null) || (channelstr.length==0) ) {
 			return message.reply(prefix +'admin-help');
 		}
@@ -267,11 +408,11 @@ client.on('message', async message => {
 		return message.reply(await settings.get_server_channel(message_guild_name));
 	}
 	if (parsed.command === "admin-user-list") {
-		console.log('admin user list');
+		//console.log('admin user list');
 		var outstr = '';
 		var admins_id = settings.get_server_admins(message_guild_name);
 		admins_id.forEach(element => {
-			console.log('each admin: ' + element.user);
+			//console.log('each admin: ' + element.user);
 			const User = client.users.cache.get(element.user); // Getting the user by ID.
 			if (User) { // Checking if the user exists.
 				outstr += User.tag + ' '; // The user exists.
@@ -334,7 +475,7 @@ client.on('message', async message => {
 	if (parsed.command === "admin-help") {
 		var adminhelpson = {
 			'set [0-4] [emojii]': 'set prize, 0-4, optional emojii',
-			'alias [true|false]': 'enable s or S for spin',
+			'alias [true|false]': 'enable s or Ss for spin',
 			'channel [channel|false]': 'restrict to channel',
 			'prefix *': 'change prefix to *',
 			'prefix fm-': 'reset prefix to fm-',

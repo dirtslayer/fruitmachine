@@ -13,7 +13,8 @@ has_player_stmt = db.prepare(has_player_str);
 }
 
 const get_player = function (id,server) {
-    return has_player_stmt.get(id,server);
+    const newLocal = has_player_stmt.get(id, server);
+    return newLocal;
 }
 module.exports.get_player = get_player;
 
@@ -74,4 +75,33 @@ const server_top10 = function (server) {
 }
 module.exports.server_top10 = server_top10;
 
+const server_first_str = 'SELECT * FROM players WHERE server = ? ORDER BY score DESC LIMIT 1';
+const server_first_stmt = db.prepare(server_first_str);
 
+const server_first = function (server) {
+    return server_first_stmt.get(server);
+}
+module.exports.server_first = server_first;
+
+const server_rank_str = 'SELECT * FROM players WHERE server = ? ORDER BY score DESC LIMIT 1 OFFSET ?';
+const server_rank_stmt = db.prepare(server_rank_str);
+
+const server_rank = function (server,r) {
+    return server_rank_stmt.get(server,r);
+}
+module.exports.server_rank = server_rank;
+
+const server_search_str = 'SELECT * FROM players WHERE server = ? AND name = ?';
+const server_search_stmt = db.prepare(server_search_str);
+
+const server_search = function (server,r) {
+    return server_search_stmt.get(server,r);
+}
+module.exports.server_search = server_search;
+
+
+//player.server_rank(serverid,orank);
+
+
+
+//SELECT * FROM users LIMIT 1 OFFSET 5132;
