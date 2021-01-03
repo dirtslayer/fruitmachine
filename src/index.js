@@ -42,11 +42,7 @@ async function spin(serverid, pid, pun) {
 		player.update_player(p.score ,p.highss, pun, pid, serverid);
 		outstr += ' ' + p.score;
 	}
-<<<<<<< HEAD
-	//console.log(pun + " " + outstr);
-=======
-	// console.log(pun + " " + outstr);
->>>>>>> 437addca2b1bda69dd8b4692998e0feaf2791aac
+
 	return outstr;
 }
 
@@ -341,7 +337,7 @@ client.on('message', async message => {
 	if (parsed.command === "stats") {
 		const instr = parsed.reader.getRemaining();
 
-		//return message.reply(await stats(message.author.id, message_guild_name));
+		return message.reply(await stats(message.author.id, message_guild_name));
 	}
 
 	if (parsed.command === "ri") {
@@ -460,7 +456,7 @@ client.on('message', async message => {
 			'stats': 'Shows your score and more',   // inventory w/l
 			'top10': `${message_guild_name} leaders`,
 			'global': 'Global leaders',
-			'help': 'https://discord.gg/pZwqzqGYey',
+			'help': '<https://discord.gg/FbT4NfKtes>',
 			'invite': 'Displays an invite link',
 			'admin-help': 'Displays admin commands'
 		};
