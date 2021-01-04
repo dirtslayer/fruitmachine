@@ -177,7 +177,8 @@ function fight(serverid, pid, pun, orank = 1) {
 		ostring += plines[3] +  '       ' + olines[3] + '\n';
 	}
 
-
+	player.update_player(p.score, p.highss , pun, pid, serverid);
+	player.update_player(o.score, o.highss , o.name, o.id, serverid);
 
 	ostring += "\n```python\n";
 	ostring += `\n`+ mypadstart(ptally.toString(),8) + '   ' + mypadstart(otally.toString(),8);
@@ -201,8 +202,7 @@ function fight(serverid, pid, pun, orank = 1) {
 		ostring += '🤷';
 	}
 
-	player.update_player(p.score, p.highss , pun, pid, serverid);
-	player.update_player(o.score, o.highss , o.name, o.id, serverid);
+	
 	
 	return ostring;
 
