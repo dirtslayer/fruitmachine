@@ -177,14 +177,17 @@ function fight(serverid, pid, pun, orank = 1) {
 		ostring += plines[3] +  '       ' + olines[3] + '\n';
 	}
 
-	player.update_player(p.score, p.highss , pun, pid, serverid);
-	player.update_player(o.score, o.highss , o.name, o.id, serverid);
-
+	if (p.id != o.id) {
+		p.score += ptally;
+		o.score += otally;
+		player.update_player(p.score, p.highss , pun, pid, serverid);
+		player.update_player(o.score, o.highss , o.name, o.id, serverid);
+	}	else {
+		p.score += ptally + otally;
+		player.update_player(p.score, p.highss , pun, pid, serverid);
+	}
 	ostring += "\n```python\n";
 	ostring += `\n`+ mypadstart(ptally.toString(),8) + '   ' + mypadstart(otally.toString(),8);
-
-	p.score += ptally;
-	o.score += otally;
 	ostring += `\n`+ mypadstart(p.score.toString(),8) + '   ' + mypadstart(o.score.toString(),8);
 
 	p.rank = player.show_rank(serverid,pid).rank;
