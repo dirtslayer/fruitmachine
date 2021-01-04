@@ -122,9 +122,9 @@ function fightss(serverid) {
 
 function fight(serverid, pid, pun, orank = 1) {
 	var toret = "";
-	var o = player.server_rank(serverid,orank-1); 
+	var o = player.get_rank(serverid,orank-1); 
 	if (typeof o == 'undefined') {
-		o = player.server_rank(serverid,0); 
+		o = player.get_rank(serverid,0); 
 	}
 	//player.server_first(serverid);
 	// fight first place person for now, will add parameter later
@@ -176,12 +176,23 @@ function fight(serverid, pid, pun, orank = 1) {
 		ostring += plines[2] +  '       ' + olines[2] + '\n';
 		ostring += plines[3] +  '       ' + olines[3] + '\n';
 	}
+
+
+
 	ostring += "\n```python\n";
 	ostring += `\n`+ mypadstart(ptally.toString(),8) + '   ' + mypadstart(otally.toString(),8);
 
 	p.score += ptally;
 	o.score += otally;
 	ostring += `\n`+ mypadstart(p.score.toString(),8) + '   ' + mypadstart(o.score.toString(),8);
+
+	p.rank = player.show_rank(pid,serverid).rank;
+	o.rank = player.show_rank(o.id,serverid).rank;
+
+	ostring += `\n`+ mypadstart(p.rank.toString(),8) + '   ' + mypadstart(o.rank.toString(),8);
+
+
+
 
 	ostring += '\n```'
 	if (winner == p) {
@@ -228,7 +239,8 @@ function unicodeLength(str) {
   }
 function mypadstart(str,width) {
 	const l = unicodeLength(str);
-	return '.'.repeat(width-l) + str;
+	//console.log ('unicode l ' + l);
+	return '.'.repeat(width - l) + str;
 }  
 
 async function showglobal() {
@@ -260,6 +272,13 @@ const allowed_admin = function(message) {
 	if (settings.is_server_admin(message)) return true;
 	if (message.member.hasPermission('ADMINISTRATOR')) return true;
 	return false;
+}
+
+const messagereply = function(message,content) {
+	for(let i = 0; i < content.length; i += 2000) {
+		const toSend = content.substring(i, Math.min(content.length, i + 2000));
+		message.reply(toSend);
+	}
 }
 
 client.on('message', async message => {
@@ -307,8 +326,10 @@ client.on('message', async message => {
 		if (mcl.substr(0,2) === 'ff')  {
 			const r = parseInt(mcl.substr(2),10);
 		 var ffress = await fight(message_guild_name, message.author.id, message.member.displayName,r);
-		return message.reply(ffress);
-		}
+
+		return messagereply(message,ffress);
+		
+	}
 		
 	} 
 	const parsed = parse.parse(message, prefix, { allowSpaceBeforeCommand: true });
@@ -331,7 +352,7 @@ client.on('message', async message => {
 	
 	if (parsed.command === "prizes") return message.reply(await showprizes(message_guild_name));
 	if (parsed.command === "top10") return message.reply(await showtop10(message_guild_name));
-	if (parsed.command === "global") return message.reply(await showglobal());
+	if (parsed.command === "global") return messagereply(message, await showglobal());
 
 
 	if (parsed.command === "stats") {

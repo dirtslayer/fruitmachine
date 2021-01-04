@@ -83,13 +83,13 @@ const server_first = function (server) {
 }
 module.exports.server_first = server_first;
 
-const server_rank_str = 'SELECT * FROM players WHERE server = ? ORDER BY score DESC LIMIT 1 OFFSET ?';
-const server_rank_stmt = db.prepare(server_rank_str);
+const get_rank_str = 'SELECT * FROM players WHERE server = ? ORDER BY score DESC LIMIT 1 OFFSET ?';
+const get_rank_stmt = db.prepare(get_rank_str);
 
-const server_rank = function (server,r) {
-    return server_rank_stmt.get(server,r);
+const get_rank = function (server,r) {
+    return get_rank_stmt.get(server,r);
 }
-module.exports.server_rank = server_rank;
+module.exports.get_rank = get_rank;
 
 const server_search_str = 'SELECT * FROM players WHERE server = ? AND name = ?';
 const server_search_stmt = db.prepare(server_search_str);
@@ -100,7 +100,13 @@ const server_search = function (server,r) {
 module.exports.server_search = server_search;
 
 
-//player.server_rank(serverid,orank);
+const show_rank_str = `select * from ( SELECT row_number() OVER ( ORDER BY score DESC ) rank, * FROM players ) t where id = ? and server = ?`;
+const show_rank_stmt = db.prepare(show_rank_str);
+
+const show_rank = function (id,server) {
+    return show_rank_stmt.get(id,server);
+}
+module.exports.show_rank = show_rank;
 
 
 
