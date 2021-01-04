@@ -292,10 +292,11 @@ const allowed_admin = function(message) {
 	return false;
 }
 
-const messagereply = function(message,content) {
-	for(let i = 0; i < content.length; i += 2000) {
-		const toSend = content.substring(i, Math.min(content.length, i + 2000));
-		message.reply(toSend);
+const messagereply = async function(message,content) {
+	for(let i = 0; i < content.length; i += 1900) {
+		const l = Math.min(content.length, i + 1900);
+		const toSend = content.substring(i,l);
+		await message.reply(toSend);
 	}
 }
 
@@ -352,6 +353,14 @@ client.on('message', async message => {
 	} 
 	const parsed = parse.parse(message, prefix, { allowSpaceBeforeCommand: true });
 	if (!parsed.success) return;
+	if (parsed.command === "guilds") {
+		var toret = '';
+		client.guilds.cache.array().forEach( element => {
+			toret += '\n' + element.name;
+		})
+		return messagereply(message,toret);
+	}
+
 	if (parsed.command === "invite") return message.reply('\n<https://discord.com/api/oauth2/authorize?client_id=780118548760625163&permissions=2048&scope=bot>');
 	if (parsed.command === "spin") {
 		var spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
