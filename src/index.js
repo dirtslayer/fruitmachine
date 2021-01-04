@@ -327,34 +327,60 @@ return helpstr;
 client.on('message', async message => {
 	
 	const message_guild_name = message.guild.name;
-
+	var skip_mention = false;
+	// check for @fruitmachine (this is dumb but i dont like catching errors)
 	try {
+		
+		if ( typeof message.mentions === 'undefined') {
+			skip_mention = true;
+		}
+		if (!skip_mention) {
+			if ( typeof message.mentions.members === 'undefined') {
+				skip_mention = true;
+			}
+		}
+		if (!skip_mention) {
+			if ( typeof message.mentions.members.first(1) === 'undefined') {
+				skip_mention = true;
+			}
+		}
+		if (!skip_mention) {
+			if ( typeof message.mentions.members.first(1)[0] === 'undefined') {
+				skip_mention = true;
+			}
+		}
+		if (!skip_mention) {
+			if ( typeof message.mentions.members.first(1)[0].user == 'undefined') {
+				skip_mention = true;
+			}
+		}
+		if (!skip_mention) {
 		const first_mention_tag = message.mentions.members.first(1)[0].user.tag;
 	
-		if ( first_mention_tag === 'fruitmachine#9521' ) {
+			if ( first_mention_tag === 'fruitmachine#9521' ) {
 			
-			const prefix = settings.get_server_prefix(message_guild_name);	
-			const channel_setting = settings.get_server_channel(message_guild_name);
-			const helpstr = help(message_guild_name);
-			return message.reply(`\nprefix is ${prefix}\nchannel is ${channel_setting}\n${prefix} help\n${helpstr}`); 
+				const prefix = settings.get_server_prefix(message_guild_name);	
+				const channel_setting = settings.get_server_channel(message_guild_name);
+				const helpstr = help(message_guild_name);
+				return message.reply(`\nprefix is ${prefix}\nchannel is ${channel_setting}\n${prefix} help\n${helpstr}`); 
+			}
 		}
 	} catch (err) {
 		// do nothing
-		console.log(JSON.stringify(err));
+		console.log('error looking for mention ' + err.message);
+		return;
 	}
 
 	var server_settings;
 	
 	try {
-		
 		var prefix = settings.get_server_prefix(message_guild_name);
-		var server_settings = settings.get_server_settings(message_guild_name);
-		
+		var server_settings = settings.get_server_settings(message_guild_name);		
 	} catch (error) {
 		settings.new_server(message_guild_name);
-		server_settings = settings.get_server_settings(message_guild_name);
-		prefix = settings.get_server_prefix(message_guild_name);
+		return message.reply('new server added');	
 	}
+
 	const channel_setting = settings.get_server_channel(message_guild_name);
 	if ( channel_setting !== 'false') {
 		var ok = false;
@@ -362,28 +388,29 @@ client.on('message', async message => {
 		if (channel_setting === '<#'+ message.channel.id + '>') ok = true;
 		if (!ok) return;
 	}
-	const alias_setting  = settings.get_server_alias(message_guild_name);
+
+	const alias_setting = settings.get_server_alias(message_guild_name);
 	if (alias_setting != 'false') {
 		const mcl = message.content.toLowerCase();
 		if ((mcl === 'spin') || (mcl === 's')) {
-			var spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
+			const spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
 			return message.reply(spinres);
 		}
-		if ((mcl === 'sss') || (mcl === 'ss') ) {
-			var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
+		if ((mcl === 'sss') || (mcl === 'ss')) {
+			const spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
 			return message.reply(spinres);
 		}
-		if (mcl.substr(0,2) === 'ff')  {
-			const r = parseInt(mcl.substr(2),10);
-		 var ffress = await fight(message_guild_name, message.author.id, message.member.displayName,r);
-
-		return messagereply(message,ffress);
-		
-	}
+		if (mcl.substr(0, 2) === 'ff') {
+			const r = parseInt(mcl.substr(2), 10);
+			const ffress = await fight(message_guild_name, message.author.id, message.member.displayName, r);
+			return messagereply(message, ffress);
+		}
 		
 	} 
+
 	const parsed = parse.parse(message, prefix, { allowSpaceBeforeCommand: true });
 	if (!parsed.success) return;
+
 	if (parsed.command === "guilds") {
 		var toret = '';
 		client.guilds.cache.array().forEach( element => {
@@ -393,23 +420,27 @@ client.on('message', async message => {
 	}
 
 	if (parsed.command === "invite") return message.reply('\n<https://discord.com/api/oauth2/authorize?client_id=780118548760625163&permissions=2048&scope=bot>');
+	
 	if (parsed.command === "spin") {
-		var spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
+		const spinres = await spin(message_guild_name, message.author.id, message.member.displayName);
 		return message.reply(spinres);
 	}
+	
 	if (parsed.command === "ss") {
-		var spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
+		const spinres = await superspin(message_guild_name, message.author.id, message.member.displayName);
 		return message.reply(spinres);
 	}
+	
 	if ((parsed.command === "ff") || (parsed.command === "fight")){
 		const r = parsed.reader.getInt();
-
 		 var ffress = await fight(message_guild_name, message.author.id, message.member.displayName,r);
 		return message.reply(ffress);
 	}
 	
 	if (parsed.command === "prizes") return message.reply(await showprizes(message_guild_name));
+
 	if (parsed.command === "top10") return message.reply(await showtop10(message_guild_name));
+
 	if (parsed.command === "leaderboard") {
 		const toret = await showleaderboard(message_guild_name);
 		return messagereply(message,toret);
@@ -417,15 +448,12 @@ client.on('message', async message => {
 	
 	if (parsed.command === "global") return messagereply(message, await showglobal());
 
-
 	if (parsed.command === "stats") {
 		const instr = parsed.reader.getRemaining();
-
 		return message.reply(await stats(message.author.id, message_guild_name));
 	}
 
 	if (parsed.command === "ri") {
-		
 		const instr = parsed.reader.getRemaining();
 		if ( (instr==null) || (instr.length==0) ) {
 			return message.reply('😜');
@@ -434,14 +462,10 @@ client.on('message', async message => {
 		return message.reply(toret);
 	}
 
-
-
-	if (parsed.command === "set") {
-		
+	if (parsed.command === "set") {		
 		if (!allowed_admin(message)) {
 			return message.reply('sorry, not admin');
-		}
-			
+		}	
 		const whichslot = parsed.reader.getInt();
 		var newchar = parsed.reader.getString();
 		if ( (newchar==null) || (newchar.length==0) ) {
@@ -449,8 +473,8 @@ client.on('message', async message => {
 		}
 		const toret = await settings.set_prize(newchar, whichslot, message_guild_name);
 		return message.reply(await showprizes(message_guild_name));
-
 	}
+
 	if (parsed.command === "prefix") {
 		if (!allowed_admin(message)) {
 			return message.reply('sorry, not admin');
@@ -462,6 +486,7 @@ client.on('message', async message => {
 		const toret = await settings.set_server_prefix(newprefix, message_guild_name);
 		return message.reply(await settings.get_server_prefix(message_guild_name));
 	}
+
 	if (parsed.command === "alias") {
 		if (!allowed_admin(message)) {
 			return message.reply('sorry, not admin');
@@ -473,38 +498,22 @@ client.on('message', async message => {
 		const toret = await settings.set_server_alias(boolstr, message_guild_name);
 		return message.reply(await settings.get_server_alias(message_guild_name));
 	}
+
 	if (parsed.command === "channel") {
 		if (!allowed_admin(message)) {
 			return message.reply('sorry, not admin');
-		}var helpson = {
-			'spin': 'Chance to win a prize (cost 1)',
-			'ss' : '8 chances to win (cost 10)',
-			'fight [rank]' : 'fruit fight against player at rank',
-			'ff [rank]' : 'alias for fruit fight',
-			'prizes': 'Displays prizes',
-			'stats': 'Shows your score and more',   // inventory w/l
-			'top10': `${message_guild_name} top 10`,
-			'leaderboard' : `${message_guild_name} leaderboard`,
-			'global': 'Global leaders',
-			'help': '<https://discord.gg/FbT4NfKtes>',
-			'invite': 'Displays an invite link',
-			'admin-help': 'Displays admin commands'
-		};
-		var helpstr = '```txt\n';
-		for (const [key, value] of Object.entries(helpson)) {
-			helpstr += `\n${key.padStart(12, ' ')}: ${value}`;
 		}
-		helpstr += '\n```';
 		var channelstr = parsed.reader.getString();
 		//channelstr = channelstr.trimLeft('<#');
 		//channelstr = channelstr.trimRight('>');
 		//console.log('channelstr : ' + channelstr);
 		if ( (channelstr==null) || (channelstr.length==0) ) {
-			return message.reply(prefix +'admin-help');
+			return message.reply(`${prefix} channel [false|#channel]\nto disable or specify channel to restrict\n@fruitmachine to show channel`);
 		}
 		const toret = await settings.set_server_channel(channelstr, message_guild_name);
 		return message.reply(await settings.get_server_channel(message_guild_name));
 	}
+
 	if (parsed.command === "admin-user-list") {
 		//console.log('admin user list');
 		var outstr = '';
