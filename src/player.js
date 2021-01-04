@@ -100,11 +100,11 @@ const server_search = function (server,r) {
 module.exports.server_search = server_search;
 
 
-const show_rank_str = `select * from ( SELECT row_number() OVER ( ORDER BY score DESC ) rank, * FROM players ) t where id = ? and server = ?`;
+const show_rank_str = `select * from ( SELECT row_number() OVER ( ORDER BY score DESC ) rank, * FROM players where server = ?) t where id = ? `;
 const show_rank_stmt = db.prepare(show_rank_str);
 
-const show_rank = function (id,server) {
-    return show_rank_stmt.get(id,server);
+const show_rank = function (server,id) {
+    return show_rank_stmt.get(server,id);
 }
 module.exports.show_rank = show_rank;
 

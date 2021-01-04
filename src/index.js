@@ -186,8 +186,8 @@ function fight(serverid, pid, pun, orank = 1) {
 	o.score += otally;
 	ostring += `\n`+ mypadstart(p.score.toString(),8) + '   ' + mypadstart(o.score.toString(),8);
 
-	p.rank = player.show_rank(pid,serverid).rank;
-	o.rank = player.show_rank(o.id,serverid).rank;
+	p.rank = player.show_rank(serverid,pid).rank;
+	o.rank = player.show_rank(serverid,o.id).rank;
 
 	ostring += `\n`+ mypadstart(p.rank.toString(),8) + '   ' + mypadstart(o.rank.toString(),8);
 
