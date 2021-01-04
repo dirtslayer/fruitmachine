@@ -327,13 +327,13 @@ return helpstr;
 client.on('message', async message => {
 	
 	const message_guild_name = message.guild.name;
-	const prefix = settings.get_server_prefix(message_guild_name);
 
 	try {
 		const first_mention_tag = message.mentions.members.first(1)[0].user.tag;
 	
 		if ( first_mention_tag === 'fruitmachine#9521' ) {
-			const prefix = settings.get_server_prefix(message_guild_name);
+			
+			const prefix = settings.get_server_prefix(message_guild_name);	
 			const channel_setting = settings.get_server_channel(message_guild_name);
 			const helpstr = help(message_guild_name);
 			return message.reply(`\nprefix is ${prefix}\nchannel is ${channel_setting}\n${prefix} help\n${helpstr}`); 
@@ -346,8 +346,10 @@ client.on('message', async message => {
 	var server_settings;
 	
 	try {
-		server_settings = settings.get_server_settings(message_guild_name);
-		prefix = settings.get_server_prefix(message_guild_name);
+		
+		var prefix = settings.get_server_prefix(message_guild_name);
+		var server_settings = settings.get_server_settings(message_guild_name);
+		
 	} catch (error) {
 		settings.new_server(message_guild_name);
 		server_settings = settings.get_server_settings(message_guild_name);
