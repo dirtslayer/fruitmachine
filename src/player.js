@@ -59,7 +59,7 @@ const update_player = function (score,highss,name,id,server) {
 }
 module.exports.update_player = update_player;
 
-const global_str = 'SELECT name,score,server FROM players ORDER BY score DESC LIMIT 30';
+const global_str = 'SELECT name,score,server FROM players ORDER BY score DESC LIMIT 50';
 const global_stmt = db.prepare(global_str);
 
 const global = function () {
@@ -74,6 +74,14 @@ const server_top10 = function (server) {
     return server_top10_stmt.all(server);
 }
 module.exports.server_top10 = server_top10;
+
+const server_leaderboard_str = 'SELECT name,score FROM players WHERE server = ? ORDER BY score DESC';
+const server_leaderboard_stmt = db.prepare(server_leaderboard_str);
+
+const server_leaderboard = function (server) {
+    return server_leaderboard_stmt.all(server);
+}
+module.exports.server_leaderboard = server_leaderboard;
 
 const server_first_str = 'SELECT * FROM players WHERE server = ? ORDER BY score DESC LIMIT 1';
 const server_first_stmt = db.prepare(server_first_str);

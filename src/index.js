@@ -234,6 +234,21 @@ async function showtop10(serverid) {
 	return outstr;
 }
 
+function showleaderboard(serverid) {
+	outstr = "\n```python\n";
+	outstr += "#     FruitMachine Leaderboard - " + serverid;
+	var results = player.server_leaderboard(serverid);
+
+	for (var i = 0; i < results.length; i++) {
+		outstr += '\n' + (i + 1).toString().padStart(3) + ' ';
+		outstr += results[i].name.padStart(33, '.') + ' ';
+		outstr += results[i].score;
+	}
+	//.log('t10: ' + outstr);
+	outstr += "\n```";
+	return outstr;
+}
+
 function unicodeLength(str) {
 	return [...str].length
   }
@@ -352,6 +367,11 @@ client.on('message', async message => {
 	
 	if (parsed.command === "prizes") return message.reply(await showprizes(message_guild_name));
 	if (parsed.command === "top10") return message.reply(await showtop10(message_guild_name));
+	if (parsed.command === "leaderboard") {
+		const toret = await showleaderboard(message_guild_name);
+		return messagereply(message,toret);
+	}
+	
 	if (parsed.command === "global") return messagereply(message, await showglobal());
 
 
