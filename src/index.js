@@ -493,9 +493,11 @@ client.on('message', async message => {
 		var helpson = {
 			'spin': 'Chance to win a prize (cost 1)',
 			'ss' : '8 chances to win (cost 10)',
+			'ff [rank]' : 'fruit fight against player at rank',
 			'prizes': 'Displays prizes',
 			'stats': 'Shows your score and more',   // inventory w/l
-			'top10': `${message_guild_name} leaders`,
+			'top10': `${message_guild_name} top 10`,
+			'leaderboard' : `${message_guild_name} leaderboard`,
 			'global': 'Global leaders',
 			'help': '<https://discord.gg/FbT4NfKtes>',
 			'invite': 'Displays an invite link',
