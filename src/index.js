@@ -8,6 +8,7 @@ const discord_key = require('./discord-key');
 const client = new Discord.Client();
 
 client.once('ready', (msg) => {
+	client.user.setActivity('🍒 @fruitmachine 🍒', { type: 'LISTENING' });
 	console.log('Ready!');
 	//
 });
@@ -300,6 +301,29 @@ const messagereply = async function(message,content) {
 	}
 }
 
+const help = function(mgn) {
+const helpson = {
+	'spin': 'Chance to win a prize (cost 1)',
+	'ss' : '8 chances to win (cost 10)',
+	'fight [rank]' : 'fruit fight against player at rank',
+	'ff [rank]' : 'alias for fruit fight',
+	'prizes': 'Displays prizes',
+	'stats': 'Shows your score and more',   // inventory w/l
+	'top10': `${mgn} top 10`,
+	'leaderboard' : `${mgn} leaderboard`,
+	'global': 'Global leaders',
+	'help': '<https://discord.gg/FbT4NfKtes>',
+	'invite': 'Displays an invite link',
+	'admin-help': 'Displays admin commands'
+};
+var helpstr = '```txt\n';
+for (const [key, value] of Object.entries(helpson)) {
+	helpstr += `\n${key.padStart(12, ' ')}: ${value}`;
+}
+helpstr += '\n```';
+return helpstr;
+}
+
 client.on('message', async message => {
 	var prefix;
 	const message_guild_name = message.guild.name;
@@ -308,10 +332,12 @@ client.on('message', async message => {
 	
 		if ( first_mention_tag === 'fruitmachine#9521' ) {
 			prefix = settings.get_server_prefix(message_guild_name);
-			return message.reply(`fruitmachine prefix is ${prefix}`);
+			const helpstr = help(message_guild_name);
+			return message.reply(`\nfruitmachine prefix is ${prefix}\n${prefix} help\n${helpstr}`); 
 		}
 	} catch (err) {
 		// do nothing
+		console.log(JSON.stringify(err));
 	}
 
 	var server_settings;
@@ -445,7 +471,25 @@ client.on('message', async message => {
 	if (parsed.command === "channel") {
 		if (!allowed_admin(message)) {
 			return message.reply('sorry, not admin');
+		}var helpson = {
+			'spin': 'Chance to win a prize (cost 1)',
+			'ss' : '8 chances to win (cost 10)',
+			'fight [rank]' : 'fruit fight against player at rank',
+			'ff [rank]' : 'alias for fruit fight',
+			'prizes': 'Displays prizes',
+			'stats': 'Shows your score and more',   // inventory w/l
+			'top10': `${message_guild_name} top 10`,
+			'leaderboard' : `${message_guild_name} leaderboard`,
+			'global': 'Global leaders',
+			'help': '<https://discord.gg/FbT4NfKtes>',
+			'invite': 'Displays an invite link',
+			'admin-help': 'Displays admin commands'
+		};
+		var helpstr = '```txt\n';
+		for (const [key, value] of Object.entries(helpson)) {
+			helpstr += `\n${key.padStart(12, ' ')}: ${value}`;
 		}
+		helpstr += '\n```';
 		var channelstr = parsed.reader.getString();
 		//channelstr = channelstr.trimLeft('<#');
 		//channelstr = channelstr.trimRight('>');
@@ -502,26 +546,8 @@ client.on('message', async message => {
 
 
 	if (parsed.command === "help") {
-		var helpson = {
-			'spin': 'Chance to win a prize (cost 1)',
-			'ss' : '8 chances to win (cost 10)',
-			'fight [rank]' : 'fruit fight against player at rank',
-			'ff [rank]' : 'alias for fruit fight',
-			'prizes': 'Displays prizes',
-			'stats': 'Shows your score and more',   // inventory w/l
-			'top10': `${message_guild_name} top 10`,
-			'leaderboard' : `${message_guild_name} leaderboard`,
-			'global': 'Global leaders',
-			'help': '<https://discord.gg/FbT4NfKtes>',
-			'invite': 'Displays an invite link',
-			'admin-help': 'Displays admin commands'
-		};
-		var helpstr = '```txt\n';
-		for (const [key, value] of Object.entries(helpson)) {
-			helpstr += `\n${key.padStart(12, ' ')}: ${value}`;
-		}
-		helpstr += '\n```';
-		return message.reply(helpstr);
+		
+		return message.reply(help(message_guild_name));
 	}
 
 	if (parsed.command === "admin-help") {
