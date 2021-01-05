@@ -7,6 +7,6 @@ emoji slot machine using discord.js and sqlite
 <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
   new Crate({
     server: '783924546884730891', // fruitmachine
-    channel: '785253822670700544' // #🍒fruit-machine
+    channel: '795864697055215666' // #you-are-here
   })
 </script>
