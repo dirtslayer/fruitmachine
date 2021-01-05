@@ -378,7 +378,7 @@ client.on('message', async message => {
 		var server_settings = settings.get_server_settings(message_guild_name);		
 	} catch (error) {
 		settings.new_server(message_guild_name);
-		return message.reply('new server added');	
+		return message.reply('\n use \n\nfm-channel [#some-channel]\n\nto restrict the game to a certain channel \n\n' + help(message_guild_name));	
 	}
 
 	const channel_setting = settings.get_server_channel(message_guild_name);
