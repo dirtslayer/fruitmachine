@@ -4,5 +4,9 @@ emoji slot machine using discord.js and sqlite
 
 [invite](https://discord.com/api/oauth2/authorize?client_id=780118548760625163&permissions=2048&scope=bot)
 
-todo: break up long fights that are 2k + chars
-more testing invalid values for params in ff
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '783924546884730891', // fruitmachine
+    channel: '785253822670700544' // #🍒fruit-machine
+  })
+</script>
