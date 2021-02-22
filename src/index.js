@@ -159,7 +159,7 @@ function fight(serverid, pid, pun, orank = 1) {
 		
 	}
 	
-	var ostring = "```python\n";
+	var ostring = "\n```python\n";
 	//ostring += `\n`+ mypadstart( o.name ,8) + '   ' + mypadstart(p.name,8);
 	//ostring += JSON.stringify(o);
 	ostring += `You        ${o.name}`;
@@ -187,7 +187,7 @@ function fight(serverid, pid, pun, orank = 1) {
 		p.score += ptally + otally;
 		player.update_player(p.score, p.highss , pun, pid, serverid);
 	}
-	ostring += "\n```python\n";
+	ostring += "\n```python";
 	ostring += `\n`+ mypadstart(ptally.toString(),8) + '   ' + mypadstart(otally.toString(),8);
 	ostring += `\n`+ mypadstart(p.score.toString(),8) + '   ' + mypadstart(o.score.toString(),8);
 
@@ -293,13 +293,49 @@ const allowed_admin = function(message) {
 	return false;
 }
 
-const messagereply = async function(message,content) {
+const messagereplyxxx= async function(message,content) {
 	for(let i = 0; i < content.length; i += 1900) {
 		const l = Math.min(content.length, i + 1900);
 		const toSend = content.substring(i,l);
 		await message.reply(toSend);
 	}
 }
+
+const messagereply = async function(message,content) {
+	const defaultwidth = 1900;
+	var width = 0;
+	var done = false;
+	var index = 0;
+	var toSend = '';
+	var lio = defaultwidth;
+	
+	while( ! done) {
+		if (index+defaultwidth>content.length){
+			toSend = content.substring(index);
+			index = content.length;
+			
+		}
+		else {
+ 
+		lio = content.lastIndexOf('\n\n',index+defaultwidth);
+		if ((lio == -1) || (lio<index)){
+			toSend = content.substring(index,defaultwidth);
+			index += defaultwidth;
+		}
+	
+	else	if (lio < index + defaultwidth) {
+		toSend = content.substring(index,lio);
+		index = lio + 1;
+	}
+	else	if (lio >= index + defaultwidth) {
+	console.log("wtf");
+	}
+	}
+		
+       await message.reply(toSend);
+       done = (index>=content.length); 
+    }
+ }
 
 const help = function(mgn) {
 const helpson = {
